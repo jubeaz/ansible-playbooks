@@ -1,0 +1,10 @@
+---
+- name: update all packages
+  gather_facts: true
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: 
+      debug: var=var_1
+      when: "'alias_servers' not in  group_names"

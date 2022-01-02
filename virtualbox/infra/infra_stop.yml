@@ -1,0 +1,31 @@
+---
+- name:
+  gather_facts: true
+  hosts: vbox_servers
+  tasks:
+    - name: Get running vms
+      command:
+        argv:
+          - vboxmanage
+          - list
+          - runningvms
+      register: _vms
+
+    - name:
+      set_fact:
+        running_vms: []
+
+    - name: Parse running vms
+      set_fact:
+        running_vms: "{{  running_vms | default([]) + [item |regex_replace('\"') | regex_replace(' {.*}') ] }}"
+      with_items: "{{ _vms.stdout_lines }}"
+
+    - name: stop vms
+      command:
+        argv:
+          - vboxmanage
+          - controlvm
+          - "{{ item.name }}"
+          - acpipowerbutton
+      with_items: "{{ vms }}"
+      when: item.name in running_vms

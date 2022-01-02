@@ -1,0 +1,21 @@
+---
+- name: Create TLS certificate
+  gather_facts: true
+  hosts: all
+  vars:
+    user: root
+    group: root
+  become: true
+  become_user: root
+  roles:
+    - role: pki-create-cert
+      _ca_name: 'honbu-pki-test.jinteki.lan' 
+      _client_group_name: libvirt_servers
+      _key_path_var: libvirt_key_path
+      _key_file_var: libvirt_key_file
+      _cert_path_var: libvirt_cert_path
+      _cert_file_var: libvirt_cert_file
+      _owner_user_var: user
+      _owner_group_var: group
+      _csr_template_name: TLS_libvirt
+      _ca_template_name: TLS_server

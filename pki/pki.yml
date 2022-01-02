@@ -1,0 +1,8 @@
+---
+- name: update all packages
+  gather_facts: true
+  hosts: pki_servers
+  become: true
+  become_user: root
+  roles:
+    - {role: pki, pki_group: 'pki_servers' }

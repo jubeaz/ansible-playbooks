@@ -1,0 +1,112 @@
+---
+- name: 
+  gather_facts: true
+  hosts: vbox_servers
+  tasks:
+    - name: Get existing vms
+      command:
+        argv:
+          - vboxmanage
+          - list
+          - vms
+      register: _vms
+    - name:
+      set_fact:
+        installed_vms: []
+
+    - name: Parse vms
+      set_fact:
+        installed_vms: "{{  installed_vms | default([]) + [item |regex_replace('\"') | regex_replace(' {.*}') ] }}"
+      with_items: "{{ _vms.stdout_lines }}"
+
+    - name: Import new vms
+      command:
+        argv:
+          - vboxmanage
+          - import
+          - "{{ vbox_base_dir }}/ovfs/{{ item.image }}"
+          -  --vsys
+          - 0
+            #          - --group
+            #          - "{{ item.group }}"
+          - --vmname
+          - "{{ item.name }}"
+          - --basefolder
+          - "{{ vbox_base_dir }}/vms"
+          - --cpus
+          - "{{ item.cpu }}"
+          - --memory
+          - "{{ item.memory }}"
+          - --unit
+          - 11
+          - --disk
+          - "{{ vbox_base_dir }}/vms/{{ item.name }}.vmdk"
+      with_items: "{{ vms }}"
+      when: item.name not in installed_vms
+
+    - name: Change network type
+      command:
+        argv:
+          - vboxmanage
+          - modifyvm
+          - "{{ item.name }}"
+          - --nic1
+          - bridged
+          - --bridgeadapter1
+          - "{{ vbox_nic_name }}"
+      with_items: "{{ vms }}"
+
+    - name: Create shared folder
+      become: true
+      become_user: root
+      file:
+        state: directory
+        group: root
+        owner: root
+        mode: "0777"
+        path: "{{ vbox_base_dir }}/share/{{ item.name }}"
+      with_items: "{{ vms }}"
+
+    - name: Umount share for existing vms
+      command:
+        argv:
+          - vboxmanage
+          - sharedfolder
+          - remove
+          - "{{ item.name }}"
+          - --name=init
+      with_items: "{{ vms }}"
+      when: item.name in installed_vms
+
+    - name: Mount share
+      command:
+        argv:
+          - vboxmanage
+          - sharedfolder
+          - add
+          - "{{ item.name }}"
+          - --name
+          - init
+          - --hostpath
+          - "{{ vbox_base_dir }}/share/{{ item.name }}"
+          - --automount
+      with_items: "{{ vms }}"
+
+    - name: Set init script
+      template:
+        src: templates/vm_import_init.sh.j2
+        dest:  "{{ vbox_base_dir }}/share/{{ item.name }}/init.sh"
+        mode: "0777"
+      with_items: "{{ vms }}"
+
+        #    - name: change network interface
+        #      command:
+        #        argv:
+        #          - vboxmanage
+        #          - modifyvm
+        #          - "{{ item.name }}"
+        #          - --nic1
+        #          - bridged
+        #          - --bridgeadapter1
+        #          - "{{ vbox_nic_name }}" 
+        #      with_items: "{{ vms }}"

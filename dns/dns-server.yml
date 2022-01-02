@@ -1,0 +1,8 @@
+---
+- name: update all packages
+  gather_facts: true
+  hosts: dns_servers
+  become: true
+  become_user: root
+  roles:
+    - role: dns-server
