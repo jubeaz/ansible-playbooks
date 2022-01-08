@@ -1,0 +1,9 @@
+---
+- name: update all packages
+  gather_facts: true
+  hosts: bt_servers
+  become: true
+  become_user: root
+  roles:
+    - { role: bluetooth-headset, when: "'alias_servers' not in  group_names"}
+

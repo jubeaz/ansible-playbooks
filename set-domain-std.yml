@@ -10,5 +10,7 @@
     - { role: gen-locale, when: "'alias_servers' not in  group_names"}
     - { role: ufw, when: "'alias_servers' not in  group_names"}
     - { role: zabbix-client, when: "'alias_servers' not in  group_names"}
+    - { role: grub, when: "'alias_servers' not in  group_names"}
+    - { role: opensshd, when: "'alias_servers' not in  group_names"}
       #    - { role: trust-certs, when: "'alias_servers' not in  group_names"}
 

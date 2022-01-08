@@ -5,4 +5,5 @@
   become: true
   become_user: root
   roles:
-    - { role: trust-certs, pki_group: 'pki_servers', _trust_certs_dir: "~/certs"}
+    - { role: grub, when: "'alias_servers' not in  group_names"}
+

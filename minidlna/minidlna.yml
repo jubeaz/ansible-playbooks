@@ -1,7 +1,7 @@
 ---
 - name: update all packages
   gather_facts: true
-  hosts: minidlna
+  hosts: minidlna_servers
   become: true
   become_user: root
   roles:

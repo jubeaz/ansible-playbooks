@@ -15,7 +15,6 @@ echo "DNS={{ item.dns }}" >> /etc/systemd/network/0.network
 echo "Reset networking"
 systemctl restart systemd-networkd
 
-echo "Disable init-jinteki"
 systemctl disable init-vm
 echo "Delete this script"
 rm /media/sf_init/init.sh
