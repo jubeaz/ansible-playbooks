@@ -1,0 +1,9 @@
+---
+- name: update all packages
+  gather_facts: true
+  hosts: lxde_servers
+  become: true
+  become_user: root
+  roles:
+    - { role: lxde, when: "'alias_servers' not in  group_names"}
+
