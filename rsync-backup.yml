@@ -1,9 +1,8 @@
 ---
 - name: update all packages
   gather_facts: true
-  hosts: honbu.jinteki.lan
+  hosts: all
   become: true
   become_user: root
   roles:
-    - { role: lxde, when: "'alias_servers' not in  group_names"}
-
+    - { role: rsync-backup, when: "'alias_servers' not in  group_names"}

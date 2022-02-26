@@ -2,9 +2,16 @@
 - name: update all packages
   gather_facts: true
   hosts: all
+  vars:
+    __pacman_update:
+      - titi
+      - toto
   become: true
   become_user: root
   tasks:
+    - 
+    - name:
+      set_fact:
+        __exchange_dir: "{{ hostvars[ansible_host].ans_exchange_dir }}"
     - name: 
-      debug: var=var_1
-      when: "'alias_servers' not in  group_names"
+      local_action: copy content={{ __pacman_update }} dest="{{ __exchange_dir }}/{{ ansible_hostname }}"
